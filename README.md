@@ -50,6 +50,18 @@ Deck.slide('hello', {
 grid, colours, components), the manim-web stage, the 3D add-on, data files and checking. Point your coding
 agent at it.
 
+## Publish
+
+The decks are a static site, so any static host works. For Cloudflare Pages (with `wrangler login` done once):
+
+```bash
+tools/deploy_pages.sh [project]     # default project: interactive-slides
+```
+
+It publishes `index.html` (the front page, which opens the example talk), `talks/`, `web/` and `vendor/`, and
+nothing else from the repo. A custom domain is added once in the Pages project, plus a CNAME to
+`<project>.pages.dev` in DNS.
+
 ## What's in the box
 
 - `web/deck.js`, `web/deck.css` — runtime and design language: 16:9 frames that scale to any screen, a
@@ -57,8 +69,11 @@ agent at it.
   light/dark themes, a laser pointer, and a WebGL budget so many 3D slides don't exhaust the browser.
 - `web/manim.js` — `Deck.manim`: write what each click plays; going back rebuilds the scene at that step.
 - `web/plots.js` — `Deck.groupedBars`: bar charts that grow a group or a series per click.
-- `web/addons/` — `Deck.turntable` (drag/zoom 3D stage), `Deck.molstar` (outlines, ambient occlusion and
-  lighting tuned against Mol*), `Deck.cartoon` (protein cartoons built like Mol*'s).
+- `web/addons/` — `Deck.turntable` (drag/zoom 3D stage, with eased camera moves for close-ups and pans),
+  `Deck.molstar` (outlines, ambient occlusion and lighting tuned against Mol*), `Deck.cartoon` (protein
+  cartoons built like Mol*'s), `Deck.ballStick` and `Deck.cages` (atoms, and wireframe cages for targets).
+- `talks/example/slides/design_check.js` — two slides checking a generated enzyme design against its request:
+  target cages, a switch, zooms into the requested residues and out again, then into a clash elsewhere.
 - `talks/example/slides/alphabet.js` — the 20 amino acids, flown out of a grid and joined into a chain
   (HTML, SVG and CSS transitions alone), then the chain lifted off the page into its real 3D shape and
   stripped to its backbone (the 3D add-on).

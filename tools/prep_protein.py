@@ -3,6 +3,7 @@ structure and the way the ribbon faces.
 
     python tools/prep_protein.py talks/example/data/1ubq.cif talks/example/data/ubiquitin.json
     python tools/prep_protein.py my.pdb talks/<talk>/data/my_protein.json --chain B
+    python tools/prep_protein.py talks/example/data/1ubq.cif talks/example/data/ubiquitin.json --atoms
 
 Writes <out>.json and <out>.js; the .js sets window.DATA["<out stem>"], so a deck page that loads it with a
 <script> tag works straight from disk (browsers will not fetch JSON from file://).
@@ -13,6 +14,8 @@ Writes <out>.json and <out>.js; the .js sets window.DATA["<out stem>"], so a dec
 - Secondary structure ('H' helix, 'E' strand, 'C' anything else) comes from the file's helix and sheet
   records, or from DSSP via mdtraj when there are none (generated designs usually have none); without mdtraj
   it falls back to all coil and says so.
+- With --atoms, every heavy atom too ("atoms": name, element, residue index, xyz in the same frame, and bonds:
+  within a residue by distance, plus each peptide bond), for ball-and-stick side chains on the cartoon.
 - The ribbon's facing is each residue's C→O direction, stored in a frame built from the Cα trace alone
   (ca_frame below, frameAt in cartoon.js), so a slide can move the Cα atoms and the ribbons turn with them.
 
@@ -61,11 +64,38 @@ def dssp(residues):
     return ["C" if c not in "HE" else c for c in ss]
 
 
+def all_atoms(residues, centre, rot):
+    """Every heavy atom (no OXT) in the cartoon's frame, and the bonds: pairs within 1.9 Å in one residue, and
+    each residue's C to the next one's N."""
+    names, elements, owner, xyz = [], [], [], []
+    for k, r in enumerate(residues):
+        for a in r:
+            if a.element.name == "H" or a.name == "OXT":
+                continue
+            names.append(a.name)
+            elements.append(a.element.name.title() if len(a.element.name) > 1 else a.element.name)
+            owner.append(k)
+            xyz.append(a.pos.tolist())
+    xyz = (np.array(xyz) - centre) @ rot.T
+    index = {(owner[i], names[i]): i for i in range(len(names))}
+    bonds = []
+    for k in range(len(residues)):
+        members = [i for i in range(len(names)) if owner[i] == k]
+        for x, i in enumerate(members):
+            for j in members[x + 1:]:
+                if np.linalg.norm(xyz[i] - xyz[j]) < 1.9:
+                    bonds.append([i, j])
+        if (k, "C") in index and (k + 1, "N") in index:
+            bonds.append([index[(k, "C")], index[(k + 1, "N")]])
+    return {"names": names, "elements": elements, "residue": owner, "xyz": np.round(xyz, 3).tolist(), "bonds": bonds}
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("structure", type=Path, help="PDB or mmCIF file")
     ap.add_argument("out", type=Path, help="output .json (a .js beside it is written too)")
     ap.add_argument("--chain", help="chain name (default: the first protein chain)")
+    ap.add_argument("--atoms", action="store_true", help="also write every heavy atom and the bonds")
     args = ap.parse_args()
 
     st = gemmi.read_structure(str(args.structure))
@@ -129,6 +159,10 @@ def main():
           f"{s.count('C')} other), radius {radius:.1f} Å; chain breaks after {gaps or 'none'}")
     out = {"source": args.structure.name, "chain": chain.name, "sequence": seq, "radius": round(radius, 2),
            "ca": np.round(ca, 3).tolist(), "ss": s, "dir": coeffs, "breaks": gaps}
+    out["residues"] = [{"name": r.name.title(), "num": r.seqid.num} for r in residues]
+    if args.atoms:
+        out["atoms"] = all_atoms(residues, centre, rot)
+        print(f"  {len(out['atoms']['xyz'])} heavy atoms, {len(out['atoms']['bonds'])} bonds")
     args.out.write_text(json.dumps(out))
     args.out.with_suffix(".js").write_text(
         f"(window.DATA = window.DATA || {{}})[{json.dumps(args.out.stem)}] = {json.dumps(out)};\n")

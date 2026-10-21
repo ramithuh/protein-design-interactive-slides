@@ -3,3 +3,5 @@ talks/*/check/
 __pycache__/
 .DS_Store
 node_modules/
+# wrangler's local cache (tools/deploy_pages.sh)
+.wrangler/

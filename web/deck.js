@@ -39,7 +39,8 @@
   const CPK = { C: '#909090', N: '#3050f8', O: '#ff0d0d', S: '#ffff30', P: '#ff8000', other: '#ff1493' };
   // The drawing palettes: the same colours as the CSS variables in web/deck.css, for canvases and SVG that
   // cannot read CSS. Keep the two in step. `series` matches --plot-1.. (charts and manim-web figures alike);
-  // `neutral` is the grey for whatever is context rather than the point; `ss` and `el` are for the 3D add-ons
+  // `neutral` is the grey for whatever is context rather than the point; `ligand` and `metal` colour small
+  // molecules' carbons and metal ions in 3D; `ss` and `el` are for the 3D add-ons
   // (helix / strand / coil, and element colours for flat drawings). Lit 3D surfaces read darker than flat 2D
   // strokes, so the light theme's 3D greys are lifted.
   const PALETTES = {
@@ -47,7 +48,7 @@
       bg: '#0f1218', fg: '#e8eaed', muted: '#9aa0a6', detail: '#6e747c', accent: '#7aa2f7', done: '#5cc98a',
       series: ['#7d8aa0', '#d9a93f', '#7aa2f7', '#5cc98a', '#ef6b6b'],
       rainbow: ['#3b5bdb', '#15aabf', '#40c057', '#fab005', '#fd7e14', '#e03131'],
-      neutral: '#9aa0a6', ss: { H: '#e8575c', E: '#f2c14e', C: '#8a9099' },
+      neutral: '#9aa0a6', ligand: '#6fdc8c', metal: '#c79bf2', ss: { H: '#e8575c', E: '#f2c14e', C: '#8a9099' },
       el: { C: '#b8bec7', N: '#6c8cff', O: '#ef6b6b', S: '#f2c14e', P: '#ff9f43', other: '#c79bf2' },
       ambient: 0.35, cpk: CPK,
     },
@@ -55,7 +56,7 @@
       bg: '#fbfaf8', fg: '#1d2129', muted: '#5c6370', detail: '#9ba1aa', accent: '#2f55d4', done: '#1f9d55',
       series: ['#98a6bc', '#dfaa3e', '#2f55d4', '#1f9d55', '#cf3434'],
       rainbow: ['#2f4ac0', '#0b8ea6', '#2b9a46', '#d39200', '#e8590c', '#c92a2a'],
-      neutral: '#b4bac3', ss: { H: '#d6334a', E: '#c98a00', C: '#8b919b' },
+      neutral: '#b4bac3', ligand: '#1f8a3c', metal: '#8a4fd0', ss: { H: '#d6334a', E: '#c98a00', C: '#8b919b' },
       el: { C: '#7d848f', N: '#3a5bd9', O: '#cf3434', S: '#c98a00', P: '#e67700', other: '#8a4fd0' },
       ambient: 1.1, cpk: CPK,
     },

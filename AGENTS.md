@@ -19,9 +19,9 @@ refresh the browser. Decks work offline and straight from disk (`file://`).
 | `web/deck.css` | **The design language**: type scale, colours, layout grid, footer, step reveals, points column, chart layout. |
 | `web/manim.js` | `Deck.manim`: a manim-web scene that plays one step per click. |
 | `web/plots.js` | `Deck.groupedBars`: the one bar-chart layout. |
-| `web/addons/` | The 3D add-on: `molstar.js` (a Mol*-like look), `cartoon.js` (protein cartoons), `turntable.js` (drag/zoom/rock stage). Only talks that show molecules load these. |
+| `web/addons/` | The 3D add-on: `molstar.js` (a Mol*-like look), `cartoon.js` (protein cartoons), `turntable.js` (drag/zoom/rock stage with camera moves), `atoms.js` (ball-and-stick, target cages). Only talks that show molecules load these. |
 | `talks/<name>/` | One talk: `index.html` (the slide order), `slides/*.js`, `data/*.js`. `talks/example/` shows every feature. |
-| `tools/` | `check_deck.py` (headless check of a deck), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
+| `tools/` | `check_deck.py` (headless check of a deck), `deploy_pages.sh` (publish to Cloudflare Pages), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
 | `vendor/` | manim-web, Reveal.js, the Lato font — each with its licence. Never load anything from a CDN. |
 
 ## The slide contract
@@ -117,16 +117,23 @@ return { enter(step, animate) { Deck.show(frame, step, animate); return stage.go
 
 ## The 3D add-on
 
-Load `web/addons/{molstar,cartoon,turntable}.js` in the talk's `index.html`. Pattern (see
-`talks/example/slides/molecule.js`, `protein.js`):
+Load `web/addons/{molstar,cartoon,turntable,atoms}.js` in the talk's `index.html`. Pattern (see
+`talks/example/slides/molecule.js`, `protein.js`, `design_check.js`):
 
 - `const view = Deck.turntable(host, { radius, scale })` — `radius` in scene units (the model's half-size),
   `scale` = scene units per Å. Drag turns, wheel zooms, idle rock; a plain click still steps the deck.
 - Add `M.Molecule3D` (positions **and radii** scaled by `scale`) or three.js meshes with `view.add`.
 - `Deck.cartoon(data, { color } | { ss: P.ss })` builds in **Å**; scale its mesh (`mesh.scale.setScalar(scale)`),
   never the Cα coordinates (ribbon widths are Å, so scaling coordinates makes fat ribbons).
-- Protein data: `python tools/prep_protein.py my.cif talks/<talk>/data/my_protein.json` → load
+- `view.model` is a group in Å (scaled by `scale`): put three.js content there. `await view.focus(pointÅ, zoom, ms)`
+  moves the camera's turning point and zoom (the close-up / pan / zoom-out transitions); `view.project(pointÅ)`
+  gives screen pixels for HTML labels, placed in `view.onRender`. Fade the context (cartoon) in close-ups, or it
+  fills the view.
+- `Deck.ballStick(points, colours, bonds)` and `Deck.cages(points)` (`atoms.js`): instanced, fade as one. Cages
+  mark where atoms were asked to be.
+- Protein data: `python tools/prep_protein.py my.cif talks/<talk>/data/my_protein.json [--atoms]` → load
   `data/my_protein.js`, read `data.my_protein`.
+- On/off over a figure: `<button class="deck-switch" aria-pressed="true"><i></i>label</button>` (deck.css).
 - Mark 3D slides `interactive: true`; wire `leave: view.stop`, `freeze: view.render`, `destroy: view.dispose`.
 - Browsers keep ~16 WebGL contexts; the deck keeps only slides within 2 of the current one alive and
   pictures the rest. Always implement `destroy`.
@@ -151,6 +158,12 @@ It fails on any console error or warning and writes a picture per slide (at its 
 something under the heading, or a colour invisible in one theme are the usual faults and are not
 console errors. For live work: `python -m http.server 8000` in the repo root, then open
 `http://localhost:8000/talks/<talk>/index.html` (add `?theme=dark`, `#/5` for slide 5).
+
+## Publishing
+
+`tools/deploy_pages.sh` publishes the site to Cloudflare Pages (front page, `talks/`, `web/`, `vendor/` only).
+Publishing is outward-facing: deploy only when the person asks, and run `check_deck.py` first. A new talk
+appears at `/talks/<name>/`; link it from the root `index.html` if it should be findable.
 
 ## Conventions
 

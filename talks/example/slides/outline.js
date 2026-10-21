@@ -34,6 +34,7 @@ Deck.topics({
     ['The protein alphabet', ['alphabet', 'backbone'], '20 amino acids joined into a chain, then lifted into 3D'],
     ['Small molecules', ['molecule'], 'ball and stick with a Mol*-like look'],
     ['Proteins', ['protein'], 'a cartoon from any PDB or mmCIF file'],
+    ['Checking a design', ['design-task', 'design-clash'], 'an enzyme design against its request: zoom in, out, and elsewhere'],
   ],
 });
 Deck.expand('2');
