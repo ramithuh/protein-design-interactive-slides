@@ -1,0 +1,238 @@
+/* The design language of the live decks: fonts, theme colours, the 16:9 slide frame, the type scale, the
+   section footer, step reveals, the points column and the chart layout. Slides style only what is their own
+   (a figure's position, say) and take everything else from here. Inside a frame, 1em is 1/100 of the frame's
+   width, so sizes scale with the screen. */
+
+@font-face { font-family: Lato; font-weight: 400; src: url("../vendor/fonts/Lato-Regular.ttf") format("truetype"); }
+@font-face { font-family: Lato; font-weight: 600; src: url("../vendor/fonts/Lato-Semibold.ttf") format("truetype"); }
+@font-face { font-family: Lato; font-weight: 700; src: url("../vendor/fonts/Lato-Bold.ttf") format("truetype"); }
+
+/* The theme colours (web/deck.js mirrors them as Deck.palette, for canvases and SVG): background, text,
+   secondary text, the accent (headings, numbers, the point of a figure), done (finished topics), detail
+   (credits and side remarks, quieter than muted) and the highlighter for <mark class="deck-mark">. */
+:root { --bg: #0f1218; --fg: #e8eaed; --muted: #9aa0a6; --accent: #7aa2f7; --done: #5cc98a; --detail: #6e747c;
+  --mark: rgba(250, 204, 21, .32); }
+
+/* The design language. --u is 1/100 of the 16:9 frame's width; every size is a multiple of it, so slides
+   scale with the screen and share one type scale. Use the tokens rather than ad hoc sizes:
+     display  the title slide's title        heading  slide headings (.deck-heading)
+     lead     list items, key statements      body     running text
+     small    secondary text, sub-items       caption  legends, labels       micro  hints */
+:root {
+  --u: min(1vw, calc(100vh * 16 / 900));
+  --t-display: calc(4.9 * var(--u));
+  --t-heading: calc(3.4 * var(--u));
+  --t-lead: calc(2.6 * var(--u));
+  --t-body: calc(2.25 * var(--u));
+  --t-small: calc(1.9 * var(--u));
+  --t-caption: calc(1.75 * var(--u));
+  --t-micro: calc(1.4 * var(--u));
+  /* The footer bar: along the window's bottom edge, its height a fixed share of the frame (so it scales with the
+     text, whatever the window's shape), with Reveal's 3px progress bar along its bottom; text is centred in
+     what is left above that (--footer-text). */
+  --footer-h: calc(2.9 * var(--u));
+  --progress-h: 3px;
+  --footer-text: calc(var(--footer-h) - var(--progress-h));
+}
+:root[data-theme="light"] { --bg: #fbfaf8; --fg: #1d2129; --muted: #5c6370; --accent: #2f55d4; --done: #1f9d55;
+  --detail: #9ba1aa; --mark: rgba(255, 212, 0, .45); }
+
+html, body { margin: 0; height: 100%; background: var(--bg); }
+.reveal-viewport { background: var(--bg); color: var(--fg); }
+.reveal { --r-link-color: var(--accent); }
+.reveal .progress { color: var(--accent); }
+.reveal .controls { color: var(--muted); }
+
+/* Each slide draws into a 16:9 frame inside its Reveal section, letterboxed into the window. */
+.reveal .slides > section { height: 100%; padding: 0; }
+.deck-frame { position: absolute; left: 50%; top: 50%; width: calc(100 * var(--u)); aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%); font-size: var(--u); color: var(--fg); text-align: left;  /* Reveal centres */
+  font-family: Lato, "Helvetica Neue", Arial, sans-serif; line-height: 1.3; }
+.deck-step { display: none; }
+/* A frozen slide's canvases, pictured at their last frame (web/deck.js freeze()). */
+.deck-frame .deck-still { position: absolute; display: block; pointer-events: none; }
+
+/* The slide heading: top left, bold and in the accent colour so it stands apart from the body text.
+   Content starts below ~15% of the frame's height. */
+.deck-heading { position: absolute; left: 4.2%; top: 5%; margin: 0; font-size: var(--t-heading); font-weight: 700;
+  color: var(--accent);
+  line-height: 1.15; }
+
+/* The slide number: plain Lato in the frame's bottom-right corner (Reveal draws it as a boxed, underlined link). */
+/* (centred in the footer bar's strip, in the footer's type, on every slide; Reveal sets display itself, so the
+   line height does the centring) */
+.reveal .slide-number { height: var(--footer-text); bottom: var(--progress-h); background: none; padding: 0;
+  font: 600 calc(1.2 * var(--u)) / var(--footer-text) Lato, "Helvetica Neue", sans-serif; color: var(--muted);
+  right: calc((100vw - 100 * var(--u)) / 2 + 2.4 * var(--u)); }
+.reveal .slide-number a { color: inherit; text-decoration: none; }
+/* the busy dot (deck.js busy()): pulses left of the slide number while a step is still animating */
+.reveal .slide-number::before { content: ''; display: inline-block; width: .55em; height: .55em; margin-right: .6em;
+  border-radius: 50%; background: var(--accent); vertical-align: .05em; opacity: 0; transition: opacity .3s; }
+.deck-busy .reveal .slide-number::before { opacity: 1; animation: deck-busy .8s ease-in-out infinite alternate; }
+@keyframes deck-busy { from { opacity: .25; } to { opacity: 1; } }
+
+/* The section footer (Deck.sections): a bar along the window's bottom edge with the talk's numbered sections,
+   the current slide's at full strength and the rest dimmed. Slide content stops at its hairline. Hidden on
+   slides in no section and in the overview; the slide number and progress bar stay on top of it. */
+.deck-footer { position: absolute; z-index: 30; display: flex; align-items: center; gap: calc(3.4 * var(--u));
+  box-sizing: border-box; left: 0; bottom: 0; width: 100vw; height: var(--footer-h);
+  padding: 0 0 var(--progress-h) calc((100vw - 100 * var(--u)) / 2 + 4.2 * var(--u));
+  background: var(--bg); border-top: 1px solid color-mix(in srgb, var(--muted) 22%, transparent);
+  font: 400 calc(1.2 * var(--u)) Lato, "Helvetica Neue", sans-serif; color: var(--muted); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity .4s; }
+.deck-footer.on { opacity: 1; }
+.deck-footer.on a:not(.empty) { pointer-events: auto; cursor: pointer; }
+.deck-footer a { opacity: .45; color: inherit; transition: opacity .4s, color .4s; }
+.deck-footer a b { margin-right: .35em; font-weight: 700; }
+.deck-footer a.current { opacity: 1; color: var(--fg); }
+.deck-footer a.current b { color: var(--accent); }
+/* a dot per topic of the current section (Deck.topics): hollow ahead, green done, accent where you are */
+.deck-footer .deck-dots { display: none; margin-left: .55em; }
+.deck-footer a.current .deck-dots { display: inline-flex; gap: .35em; vertical-align: middle; }
+.deck-footer .deck-dots i { width: .62em; height: .62em; border-radius: 50%; box-sizing: border-box;
+  border: 1.5px solid var(--muted); transition: background .3s, border-color .3s; }
+.deck-footer .deck-dots i.done { background: var(--done); border-color: var(--done); }
+.deck-footer .deck-dots i.now { background: var(--accent); border-color: var(--accent); }
+/* An expanded section (Deck.expand) takes the whole bar while you are in it. The sections before it shrink
+   to their numbers, the ones after keep their names, and its own name and dots give way to a segment per
+   topic, spread across the space between. Each segment has a hairline above it that fills like a progress
+   bar: done ones whole, the current one as far as this slide within its topic, the rest still to come.
+   The right padding keeps the bar clear of the slide number, which is wider than the frame's own margin. */
+.deck-footer .deck-subs { display: none; }
+.deck-footer.wide { padding-right: calc((100vw - 100 * var(--u)) / 2 + 8 * var(--u)); gap: calc(1.7 * var(--u)); }
+.deck-footer.wide a .deck-name { display: none; }
+.deck-footer.wide a.current ~ a .deck-name { display: inline; }
+.deck-footer.wide a.current { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+.deck-footer.wide a.current .deck-dots { display: none; }
+/* the section's own number goes too: its segments are numbered 5.1, 5.2, ... and say it already */
+.deck-footer.wide a.current > b { display: none; }
+.deck-footer.wide a.current .deck-subs { display: flex; flex: 1 1 auto; min-width: 0; gap: calc(1.2 * var(--u)); }
+/* a notch smaller than the section numbers, as a level below them; each starts at its name's width and
+   shares out what is left, so a short name is not given a long one's room */
+.deck-footer .deck-sub { --bar: var(--done); position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden;
+  font-size: calc(1.1 * var(--u));
+  text-overflow: ellipsis; padding-top: calc(.6 * var(--u)); color: var(--muted); opacity: .5;
+  transition: opacity .4s, color .4s; }
+.deck-footer .deck-sub b { margin-right: .35em; font-weight: 700; }
+.deck-footer .deck-sub::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 1px;
+  background: linear-gradient(to right, var(--bar) calc(var(--fill, 0) * 100%),
+                              color-mix(in srgb, var(--muted) 30%, transparent) 0); }
+.deck-footer .deck-sub.done { opacity: .85; }
+.deck-footer .deck-sub.now { --bar: var(--accent); opacity: 1; color: var(--fg); }
+.deck-footer .deck-sub.now b { color: var(--accent); }
+.reveal .slide-number { z-index: 31; }
+.reveal .progress { z-index: 32; }
+
+/* Laser pointer (L). Above everything, and transparent to the pointer so the draggable 3D slides keep their
+   drags; it shows only once the mouse has moved, so toggling it on never leaves a dot in the corner. */
+.deck-laser { position: fixed; left: 0; top: 0; z-index: 40; pointer-events: none; opacity: 0;
+  width: calc(1.05 * var(--u)); height: calc(1.05 * var(--u));
+  margin: calc(-.525 * var(--u)) 0 0 calc(-.525 * var(--u));
+  border-radius: 50%; background: #ff3b30; transition: opacity .15s;
+  box-shadow: 0 0 calc(.6 * var(--u)) calc(.2 * var(--u)) rgba(255, 59, 48, .7),
+              0 0 calc(2 * var(--u)) calc(.6 * var(--u)) rgba(255, 59, 48, .3); }
+.deck-laser.on { opacity: 1; }
+html.deck-lasing, html.deck-lasing .reveal, html.deck-lasing .deck-frame * { cursor: none; }
+.reveal.overview .deck-footer { display: none; }
+.deck-muted { color: var(--muted); }
+/* details the talk does not hang on (data sources, image credits): quieter than muted */
+.deck-detail, .deck-frame .deck-detail { color: var(--detail); }  /* outranks a slide's own colour */
+/* a highlighter stroke behind the words that carry the point: <mark class="deck-mark"> */
+.deck-mark { background: var(--mark); color: inherit; padding: 0 .15em; margin: 0 -.05em; border-radius: .15em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.deck-accent { color: var(--accent); }
+/* code in running text or a point's sub-line */
+.deck-code { font: 500 .92em/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--fg);
+  background: color-mix(in srgb, var(--fg) 7%, transparent); padding: .08em .35em; border-radius: .25em; }
+
+/* Things revealed on a step: `.reveal-in` fades and slides in when its slide or step adds `.in`; a parent
+   with `.instant` skips the transition (arriving from a later slide). --i staggers siblings. */
+.deck-frame .reveal-in { opacity: 0; transform: translateX(-0.6em);
+  transition: opacity .5s ease-out, transform .5s ease-out; transition-delay: calc(var(--i, 0) * 0.09s); }
+.deck-frame .reveal-in.in { opacity: 1; transform: none; }
+.deck-frame .instant .reveal-in, .deck-frame .reveal-in.instant { transition: none; }
+
+/* The layout grid. Margins are 4.2% left and right; the heading sits at the top, content between ~15% and
+   ~85%, a caption line at 87%, and the footer below. A figure-and-points slide puts its figure in
+   .deck-figure (the left ~55%) and its points in .deck-col (from --col-left to the right margin).
+     .deck-lead     a sentence under the heading, in the muted colour
+     .deck-figure   the left-hand figure area; a canvas or SVG inside fills it
+     .deck-caption  one line along the bottom, above the footer */
+.deck-frame .deck-lead { position: absolute; left: 4.2%; top: 15.5%; width: 64%; margin: 0;
+  font-size: var(--t-body); color: var(--muted); }
+.deck-frame .deck-figure { position: absolute; left: 4.2%; top: 17%; width: 52%; height: 66%; }
+.deck-frame .deck-figure > canvas, .deck-frame .deck-figure > svg { display: block; width: 100%; height: 100%; }
+.deck-frame .deck-caption { position: absolute; left: 4.2%; right: 4.2%; top: 87%; margin: 0;
+  font-size: var(--t-caption); color: var(--muted); }
+/* a stage for a full-frame manim-web or 3D scene, under the slide's text */
+.deck-frame .deck-stage { position: absolute; inset: 0; }
+.deck-frame .deck-stage.turnable { cursor: grab; touch-action: none; }
+.deck-frame .deck-stage.turnable:active { cursor: grabbing; }
+
+/* The title slide and section dividers. */
+.deck-frame .deck-title { position: absolute; left: 8%; top: 34%; width: 84%; margin: 0;
+  font-size: var(--t-display); font-weight: 700; line-height: 1.12; }
+.deck-frame .deck-subtitle { position: absolute; left: 8%; top: 52%; width: 84%; margin: 0;
+  font-size: var(--t-lead); color: var(--muted); }
+.deck-frame .deck-byline { position: absolute; left: 8%; top: 70%; font-size: var(--t-body); }
+.deck-frame .deck-byline span { display: block; margin-top: .3em; font-size: var(--t-small); color: var(--muted); }
+
+/* A slide's column of numbered points, beside a figure on the left: the deck's standard way of walking
+   through a picture a step at a time. Slides set only the variables — where it starts, how big the point
+   titles are, how far apart the points sit — and the right margin follows from --col-left. Deck.points()
+   (web/deck.js) writes this markup for you:
+     <div class="deck-col">
+       <div class="deck-point reveal-in" data-from="2">
+         <div class="deck-point-t"><span>1</span>Title</div>
+         <div class="deck-point-s">the line under it</div>
+       </div> ... */
+.deck-frame .deck-col { position: absolute; left: var(--col-left, 59%); top: var(--col-top, 19%);
+  width: calc(95.8% - var(--col-left, 59%)); }
+.deck-frame .deck-point { margin-bottom: var(--col-gap, calc(1.4 * var(--u))); }
+.deck-frame .deck-point-t { display: flex; align-items: baseline; font-weight: 600;
+  font-size: var(--col-title, var(--t-body)); }
+.deck-frame .deck-point-t > span { width: 1.4em; flex: none; color: var(--accent); font-weight: 700; }
+.deck-frame .deck-point-s { margin: .3em 0 0 1.4em; font-size: var(--t-small); color: var(--muted);
+  line-height: 1.35; }
+
+/* Plots (web/plots.js, Deck.groupedBars). One layout for every chart in the deck: a small legend centred under
+   the heading, a compact chart with wide side margins, each group's label centred under its own bars, a small
+   light-grey footnote at the bottom. --plot-dy drops the chart when no caption sits under it. */
+:root { --plot-1: #7d8aa0; --plot-2: #d9a93f; --plot-3: var(--accent); --plot-4: var(--done); --plot-5: #ef6b6b; }
+:root[data-theme="light"] { --plot-1: #98a6bc; --plot-2: #dfaa3e; --plot-5: #cf3434; }
+.deck-plot { position: absolute; inset: 0; pointer-events: none; --plot-dy: 5%; }
+.deck-plot.captioned { --plot-dy: 0%; }
+.deck-plot-key { position: absolute; left: 4.2%; right: 4.2%; top: calc(19% + var(--plot-dy) / 3); display: flex;
+  justify-content: center; gap: calc(2.4 * var(--u)); font-size: var(--t-caption); }
+.deck-plot-key i { display: inline-block; width: 1.1em; height: .55em; margin-right: .45em; border-radius: .1em; }
+.deck-plot-chart { position: absolute; left: 14%; right: 9%; top: calc(33% + var(--plot-dy)); height: 33%;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--fg) 35%, transparent); }
+.deck-plot-grid { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid color-mix(in srgb, var(--fg) 9%, transparent); }
+.deck-plot-grid span { position: absolute; right: calc(100% + .7em); transform: translateY(-50%); font-size: calc(1.3 * var(--u));
+  color: var(--muted); }
+.deck-plot-groups { position: absolute; inset: 0; display: flex; justify-content: space-around; }
+.deck-plot-group { position: relative; display: flex; align-items: flex-end; gap: calc(.4 * var(--u));
+  padding: 0 calc(1 * var(--u)); opacity: 0; transition: opacity .5s; }
+.deck-plot-group.in { opacity: 1; }
+.deck-plot-group.highlight::before { content: ''; position: absolute; inset: calc(-3 * var(--u)) 0 0;
+  background: color-mix(in srgb, var(--accent) 9%, transparent); border-radius: calc(.6 * var(--u)) calc(.6 * var(--u)) 0 0; }
+.deck-plot-bar { position: relative; width: calc(3.5 * var(--u)); height: 100%; display: flex; align-items: flex-end; }
+.deck-plot-fill { width: 100%; transform-origin: bottom; transform: scaleY(0); border-radius: .15em .15em 0 0;
+  transition: transform .9s cubic-bezier(.3, .7, .2, 1); }
+.deck-plot-group.in .deck-plot-fill { transform: scaleY(1); }
+.deck-plot-val { position: absolute; left: 50%; transform: translateX(-50%); margin-bottom: .25em; white-space: nowrap;
+  font-size: calc(1.3 * var(--u)); opacity: 0; transition: opacity .4s .6s; }
+.deck-plot-group.in .deck-plot-val { opacity: 1; }
+.deck-plot-val.strong { font-weight: 700; }
+.deck-plot-label { position: absolute; left: 50%; top: calc(100% + 1.2 * var(--u)); transform: translateX(-50%);
+  text-align: center; white-space: nowrap; font-size: var(--t-caption); line-height: 1.25; }
+.deck-plot-group.highlight .deck-plot-label { color: var(--accent); font-weight: 700; }
+.deck-plot-foot { position: absolute; left: 4.2%; top: calc(79.5% + var(--plot-dy)); width: 92%;
+  font-size: calc(1.15 * var(--u)); line-height: 1.35; }
+/* Series-wise build-up: every group stands from the start and one colour joins each of them on every click,
+   so the bar carries the reveal rather than the group it sits in. */
+.deck-plot.by-series .deck-plot-group.in .deck-plot-fill { transform: scaleY(0); }
+.deck-plot.by-series .deck-plot-bar.in .deck-plot-fill { transform: scaleY(1); }
+.deck-plot.by-series .deck-plot-group.in .deck-plot-val { opacity: 0; }
+.deck-plot.by-series .deck-plot-bar.in .deck-plot-val { opacity: 1; }
+.deck-plot.instant .deck-plot-group, .deck-plot.instant .deck-plot-fill, .deck-plot.instant .deck-plot-val { transition: none; }

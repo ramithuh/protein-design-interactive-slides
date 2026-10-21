@@ -1,0 +1,5 @@
+# pictures written by tools/check_deck.py
+talks/*/check/
+__pycache__/
+.DS_Store
+node_modules/

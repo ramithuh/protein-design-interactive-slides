@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live slides template</title>
+<!--
+  A live deck: every slide is drawn in the browser by its module in slides/ (HTML, SVG, and manim-web for
+  anything that moves). No build step: edit a slide, refresh. Arrow keys or clicks step, S speaker notes,
+  O overview, F fullscreen, T light/dark, L laser pointer. Works offline, also opened straight from disk.
+-->
+<link rel="stylesheet" href="../../vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../web/deck.css">
+</head>
+<body>
+<div class="reveal"><div class="slides"></div></div>
+
+<!-- the runtime -->
+<script src="../../vendor/reveal/reveal.js"></script>
+<script src="../../vendor/reveal/notes.js"></script>
+<script src="../../vendor/manim-web/manim-web.iife.js"></script>
+<script src="../../web/deck.js"></script>
+<script src="../../web/manim.js"></script>
+<script src="../../web/plots.js"></script>
+<!-- the 3D add-on: only talks that show molecules need these three -->
+<script src="../../web/addons/molstar.js"></script>
+<script src="../../web/addons/cartoon.js"></script>
+<script src="../../web/addons/turntable.js"></script>
+
+<!-- data the slides read (window.DATA), written by tools/ -->
+<script src="data/caffeine.js"></script>
+<script src="data/ubiquitin.js"></script>
+
+<!-- the slides, in order. Deck.section(n) puts the slides after it in section n of the footer; null = none -->
+<script>Deck.section(null)</script>
+<script src="slides/title.js"></script>
+<script src="slides/outline.js"></script>
+
+<script>Deck.section(1)</script>
+<script src="slides/figure_points.js"></script>
+<script src="slides/chart.js"></script>
+
+<script>Deck.section(2)</script>
+<script src="slides/manim_shapes.js"></script>
+<script src="slides/manim_graph.js"></script>
+
+<script>Deck.section(3)</script>
+<script src="slides/molecule.js"></script>
+<script src="slides/protein.js"></script>
+
+<script>Deck.section(null)</script>
+<script src="slides/closing.js"></script>
+
+<script>Deck.start({ title: 'Live slides template' });</script>
+</body>
+</html>
