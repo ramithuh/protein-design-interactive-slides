@@ -108,6 +108,33 @@ A recent Chrome, Edge or Firefox. Python only for the tools: `pip install playwr
 
 ## Credits
 
-Bundled in `vendor/`, each with its licence: [manim-web](https://github.com/maloyan/manim-web) 0.39.4 (MIT),
-[Reveal.js](https://revealjs.com) 6.0.1 (MIT), [Lato](https://www.latofonts.com) (SIL OFL). Example data:
-ubiquitin, PDB [1UBQ](https://www.rcsb.org/structure/1UBQ); caffeine, an RDKit conformer.
+**Bundled** in `vendor/`, each with its licence: [manim-web](https://github.com/maloyan/manim-web) 0.39.4 by
+Narek Maloyan (MIT), which also brings [three.js](https://threejs.org) (MIT); [Reveal.js](https://revealjs.com)
+6.0.1 (MIT); the [Lato](https://www.latofonts.com) font (SIL OFL).
+
+**Proteins and molecules.** The cartoons and the 3D look (`web/addons/cartoon.js`, `molstar.js`) reimplement
+the approach of [Mol*](https://molstar.org) (MIT), tuned side by side against it; no Mol* code is bundled. Element
+colours are Jmol's. If you use these slides in published work, cite the tools they stand on:
+
+- Mol*: D. Sehnal et al., *Mol\* Viewer: modern web app for 3D visualization and analysis of large biomolecular
+  structures*, Nucleic Acids Res. 49, W431–W437 (2021). [doi:10.1093/nar/gkab314](https://doi.org/10.1093/nar/gkab314)
+- gemmi: M. Wojdyr, *GEMMI: A library for structural biology*, J. Open Source Softw. 7, 4200 (2022).
+  [doi:10.21105/joss.04200](https://doi.org/10.21105/joss.04200)
+- MDTraj: R. T. McGibbon et al., *MDTraj: a modern open library for the analysis of molecular dynamics
+  trajectories*, Biophys. J. 109, 1528–1532 (2015). [doi:10.1016/j.bpj.2015.08.015](https://doi.org/10.1016/j.bpj.2015.08.015);
+  its secondary structure is DSSP: W. Kabsch and C. Sander, Biopolymers 22, 2577–2637 (1983).
+  [doi:10.1002/bip.360221211](https://doi.org/10.1002/bip.360221211)
+- RDKit: open-source cheminformatics, [rdkit.org](https://www.rdkit.org)
+- NumPy: C. R. Harris et al., *Array programming with NumPy*, Nature 585, 357–362 (2020).
+  [doi:10.1038/s41586-020-2649-2](https://doi.org/10.1038/s41586-020-2649-2)
+
+**Structures**, from the [Protein Data Bank](https://www.rcsb.org) (H. M. Berman et al., Nucleic Acids Res. 28,
+235–242 (2000), [doi:10.1093/nar/28.1.235](https://doi.org/10.1093/nar/28.1.235)):
+
+- [1UBQ](https://www.rcsb.org/structure/1UBQ), ubiquitin: S. Vijay-Kumar, C. E. Bugg and W. J. Cook, J. Mol. Biol.
+  194, 531–544 (1987). [doi:10.1016/0022-2836(87)90679-6](https://doi.org/10.1016/0022-2836(87)90679-6)
+- [1OS7](https://www.rcsb.org/structure/1OS7), TauD with iron, α-ketoglutarate and taurine (the enzyme design
+  task): J. R. O'Brien et al., Biochemistry 42, 5547–5554 (2003). [doi:10.1021/bi0341096](https://doi.org/10.1021/bi0341096)
+
+The caffeine coordinates are an RDKit conformer; the enzyme design on the design-check slides is a generated
+structure, not a deposited one.

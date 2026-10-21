@@ -1,7 +1,8 @@
 // A Mol*-like look for manim-web 3D scenes (Mol* is the viewer on the PDB's pages): a dark outline wherever
 // depth jumps (around each atom and where it passes in front of another), ambient occlusion in the creases
 // where bonds meet atoms and atoms crowd each other, matte surfaces under a soft key light beside the viewer,
-// and a little depth fog.
+// and a little depth fog. Our own shaders, tuned against Mol* (MIT): D. Sehnal et al., Nucleic Acids Res. 49,
+// W431 (2021). Atom colours: Jmol's.
 //
 //   const look = Deck.molstar(scene, { scale: s, fog: [near, far] })  // right after making the scene; s is the
 //   look.fog(near, far)              // slide's scene units per Å. Colour atoms with palette.cpk. Move the fog

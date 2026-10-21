@@ -3,6 +3,7 @@
 // curve-segment, 5.9): the same spline through the Cα atoms (tension 0.9 in helices, 0.5 elsewhere; strand Cα
 // smoothed first), the same ribbon facing (each residue's C→O, averaged with its neighbours'), the same normal
 // interpolation along a residue and the same sizes (0.2 Å, ribbons 5x as wide, arrows 1.5x that).
+// A reimplementation, not Mol*'s code. Mol* (MIT): D. Sehnal et al., Nucleic Acids Res. 49, W431 (2021).
 //
 //   const toon = Deck.cartoon(data.ubiquitin, { color: palette.neutral })   // from tools/prep_protein.py
 //   view.add(toon.mesh);        // a Deck.turntable, or any three.js group
