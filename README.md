@@ -80,9 +80,30 @@ nothing else from the repo. A custom domain is added once in the Pages project, 
 - `tools/prep_protein.py` — any PDB/mmCIF chain → cartoon data. `tools/prep_amino_acids.py` — the alphabet's
   drawings and the 3D stretch (needs RDKit). `tools/check_deck.py` — headless check.
 
+## How proteins are drawn
+
+No protein-viewer library runs in the browser. The 3D slides use three.js, which comes bundled inside
+manim-web (`M.THREE`), and code in `web/addons/` written for this repo:
+
+| Piece | What it is |
+| --- | --- |
+| `cartoon.js` | Protein cartoons (helices, strands with arrows, loops), reimplementing Mol*'s cartoon: the same spline, ribbon facing and sizes. Not Mol* itself. |
+| `molstar.js` | A render pass for the Mol* look: outlines, ambient occlusion, matte lighting, depth fog, tuned side by side against Mol*. |
+| `atoms.js` | Instanced ball-and-stick and wireframe cages (for requested positions). |
+| manim-web `Molecule3D` | Ball-and-stick for small molecules (the caffeine and peptide slides). |
+
+The data those slides read is prepared once, in Python, by the scripts in `tools/`:
+
+| Package | Used for |
+| --- | --- |
+| [gemmi](https://gemmi.readthedocs.io) | reading PDB/mmCIF: residues, atoms, helix and sheet records |
+| numpy | geometry: centring, principal axes, the ribbons' frames |
+| [mdtraj](https://www.mdtraj.org) (optional) | secondary structure (DSSP) for files without helix/sheet records, e.g. generated designs |
+| [RDKit](https://www.rdkit.org) | the amino-acid drawings and small-molecule conformers |
+
 ## Requirements
 
-A recent Chrome, Edge or Firefox. Python only for the tools: `pip install playwright gemmi numpy` (and
+A recent Chrome, Edge or Firefox. Python only for the tools: `pip install playwright gemmi numpy rdkit` (and
 `playwright install chromium`); `mdtraj` optionally, for DSSP on structures without helix/sheet records.
 
 ## Credits
