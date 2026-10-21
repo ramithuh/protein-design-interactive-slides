@@ -28,7 +28,7 @@
 // add things without animating (`({ a }, { add }) => add(a)`). The scene is transparent, so the slide's
 // background and HTML text show around it; put HTML text over it in the slide, or use M.Text / M.MathTex
 // inside it. World units: x right, y up, origin at the centre, frameWidth x frameHeight across the host.
-// Colours come from ctx.palette (P), so the light theme works; never hard-code white or black.
+// Colours come from ctx.palette (P), so both themes work; never hard-code white or black.
 (function () {
   'use strict';
 

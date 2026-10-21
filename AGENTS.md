@@ -21,7 +21,7 @@ refresh the browser. Decks work offline and straight from disk (`file://`).
 | `web/plots.js` | `Deck.groupedBars`: the one bar-chart layout. |
 | `web/addons/` | The 3D add-on: `molstar.js` (a Mol*-like look), `cartoon.js` (protein cartoons), `turntable.js` (drag/zoom/rock stage). Only talks that show molecules load these. |
 | `talks/<name>/` | One talk: `index.html` (the slide order), `slides/*.js`, `data/*.js`. `talks/example/` shows every feature. |
-| `tools/` | `check_deck.py` (headless check of a deck), `prep_protein.py` (structure → cartoon data), `vendor_manim_web.sh`. |
+| `tools/` | `check_deck.py` (headless check of a deck), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
 | `vendor/` | manim-web, Reveal.js, the Lato font — each with its licence. Never load anything from a CDN. |
 
 ## The slide contract
@@ -82,8 +82,8 @@ one caption line at 87% (`.deck-caption`); the section footer below. Components:
 
 **Colours**: CSS uses `var(--fg)`, `var(--muted)`, `var(--accent)`, `var(--detail)`, `var(--plot-1..5)`.
 Canvas, SVG and manim-web code uses `palette` (`P.fg`, `P.muted`, `P.accent`, `P.series[i]`, `P.ss`, `P.cpk`),
-which mirrors the CSS. **Never hard-code white/black or a hex colour in a slide** — the light theme (`T`, or
-`?theme=light`) must work. If you change a theme colour, change it in both `deck.css` and `PALETTES` in
+which mirrors the CSS. **Never hard-code white/black or a hex colour in a slide** — both themes must work:
+light is the default, dark is `T` or `?theme=dark`. If you change a theme colour, change it in both `deck.css` and `PALETTES` in
 `deck.js`.
 
 ## manim-web animation (the click-step centrepiece)
@@ -148,9 +148,9 @@ python tools/check_deck.py talks/example --slide manim-graph --back   # one slid
 
 It fails on any console error or warning and writes a picture per slide (at its last step) to
 `talks/<talk>/check/` (git-ignored). **Look at the pictures** in both themes — text overlapping a figure,
-something under the heading, or an invisible colour in the light theme are the usual faults and are not
+something under the heading, or a colour invisible in one theme are the usual faults and are not
 console errors. For live work: `python -m http.server 8000` in the repo root, then open
-`http://localhost:8000/talks/<talk>/index.html` (add `?theme=light`, `#/5` for slide 5).
+`http://localhost:8000/talks/<talk>/index.html` (add `?theme=dark`, `#/5` for slide 5).
 
 ## Conventions
 
@@ -163,5 +163,5 @@ console errors. For live work: `python -m http.server 8000` in the repo root, th
 
 ## Keys while presenting
 
-→/← or left/right click: step · S: speaker notes · O: overview · F: fullscreen · T: light/dark · L: laser
+→/← or left/right click: step · S: speaker notes · O: overview · F: fullscreen · T: dark/light · L: laser
 pointer · Esc: leave overview. URL `#/n` jumps to slide n.

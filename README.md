@@ -3,7 +3,7 @@
 Slide decks drawn live in the browser: HTML for text, [manim-web](https://github.com/maloyan/manim-web)
 for manim-style animations that play **one step per click**, and an optional 3D add-on that draws molecules
 and protein cartoons the way Mol* does. No build step and no rendered video — edit a slide, refresh. Decks
-work offline, straight from disk, in a dark and a light theme.
+work offline, straight from disk, in a light theme (the default) and a dark one.
 
 ![The example talk: manim-web steps, a chart, figure + points, a molecule and a protein](talks/example/preview.png)
 
@@ -18,7 +18,7 @@ Open `talks/example/index.html` in Chrome or Firefox (or run `python -m http.ser
 | S | speaker view (notes, timer, next slide) |
 | O | overview |
 | F | fullscreen |
-| T | light / dark theme (or `?theme=light`) |
+| T | dark / light theme (or `?theme=dark`) |
 | L | laser pointer |
 
 ## Make your own talk
@@ -54,12 +54,16 @@ agent at it.
 
 - `web/deck.js`, `web/deck.css` — runtime and design language: 16:9 frames that scale to any screen, a
   type scale, a section footer with per-topic progress, step reveals, a numbered points column, captions,
-  dark/light themes, a laser pointer, and a WebGL budget so many 3D slides don't exhaust the browser.
+  light/dark themes, a laser pointer, and a WebGL budget so many 3D slides don't exhaust the browser.
 - `web/manim.js` — `Deck.manim`: write what each click plays; going back rebuilds the scene at that step.
 - `web/plots.js` — `Deck.groupedBars`: bar charts that grow a group or a series per click.
 - `web/addons/` — `Deck.turntable` (drag/zoom 3D stage), `Deck.molstar` (outlines, ambient occlusion and
   lighting tuned against Mol*), `Deck.cartoon` (protein cartoons built like Mol*'s).
-- `tools/prep_protein.py` — any PDB/mmCIF chain → cartoon data. `tools/check_deck.py` — headless check.
+- `talks/example/slides/alphabet.js` — the 20 amino acids, flown out of a grid and joined into a chain
+  (HTML, SVG and CSS transitions alone), then the chain lifted off the page into its real 3D shape and
+  stripped to its backbone (the 3D add-on).
+- `tools/prep_protein.py` — any PDB/mmCIF chain → cartoon data. `tools/prep_amino_acids.py` — the alphabet's
+  drawings and the 3D stretch (needs RDKit). `tools/check_deck.py` — headless check.
 
 ## Requirements
 

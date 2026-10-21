@@ -7,7 +7,7 @@
 <!--
   A live deck: every slide is drawn in the browser by its module in slides/ (HTML, SVG, and manim-web for
   anything that moves). No build step: edit a slide, refresh. Arrow keys or clicks step, S speaker notes,
-  O overview, F fullscreen, T light/dark, L laser pointer. Works offline, also opened straight from disk.
+  O overview, F fullscreen, T dark/light theme (light is the default), L laser pointer. Works offline, also opened straight from disk.
 -->
 <link rel="stylesheet" href="../../vendor/reveal/reveal.css">
 <link rel="stylesheet" href="../../web/deck.css">
@@ -28,6 +28,7 @@
 <script src="../../web/addons/turntable.js"></script>
 
 <!-- data the slides read (window.DATA), written by tools/ -->
+<script src="data/amino_acids.js"></script>
 <script src="data/caffeine.js"></script>
 <script src="data/ubiquitin.js"></script>
 
@@ -45,6 +46,7 @@
 <script src="slides/manim_graph.js"></script>
 
 <script>Deck.section(3)</script>
+<script src="slides/alphabet.js"></script>
 <script src="slides/molecule.js"></script>
 <script src="slides/protein.js"></script>
 

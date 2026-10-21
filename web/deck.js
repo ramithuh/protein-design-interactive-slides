@@ -64,7 +64,8 @@
   // scene holds one. Slides further than this from the current one are unmounted, and rebuilt on return.
   const KEEP = 2;
 
-  const theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark';
+  // light by default; ?theme=dark (or T while presenting) for the dark theme
+  const theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
   document.documentElement.dataset.theme = theme;
   const slides = [];
   const styled = new Set();
@@ -109,7 +110,7 @@
       transition: 'fade', transitionSpeed: 'fast', backgroundTransition: 'none',
       plugins: window.RevealNotes ? [window.RevealNotes] : [],
     });
-    Reveal.addKeyBinding({ keyCode: 84, key: 'T', description: 'Switch light / dark theme' }, () => {
+    Reveal.addKeyBinding({ keyCode: 84, key: 'T', description: 'Switch dark / light theme' }, () => {
       const q = new URLSearchParams(location.search);
       q.set('theme', theme === 'light' ? 'dark' : 'light');
       location.href = `${location.pathname}?${q}${location.hash}`;

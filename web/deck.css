@@ -9,9 +9,10 @@
 
 /* The theme colours (web/deck.js mirrors them as Deck.palette, for canvases and SVG): background, text,
    secondary text, the accent (headings, numbers, the point of a figure), done (finished topics), detail
-   (credits and side remarks, quieter than muted) and the highlighter for <mark class="deck-mark">. */
-:root { --bg: #0f1218; --fg: #e8eaed; --muted: #9aa0a6; --accent: #7aa2f7; --done: #5cc98a; --detail: #6e747c;
-  --mark: rgba(250, 204, 21, .32); }
+   (credits and side remarks, quieter than muted) and the highlighter for <mark class="deck-mark">.
+   Light is the default; :root[data-theme="dark"] overrides it (T switches, or ?theme=dark). */
+:root { --bg: #fbfaf8; --fg: #1d2129; --muted: #5c6370; --accent: #2f55d4; --done: #1f9d55;
+  --detail: #9ba1aa; --mark: rgba(255, 212, 0, .45); }
 
 /* The design language. --u is 1/100 of the 16:9 frame's width; every size is a multiple of it, so slides
    scale with the screen and share one type scale. Use the tokens rather than ad hoc sizes:
@@ -34,8 +35,8 @@
   --progress-h: 3px;
   --footer-text: calc(var(--footer-h) - var(--progress-h));
 }
-:root[data-theme="light"] { --bg: #fbfaf8; --fg: #1d2129; --muted: #5c6370; --accent: #2f55d4; --done: #1f9d55;
-  --detail: #9ba1aa; --mark: rgba(255, 212, 0, .45); }
+:root[data-theme="dark"] { --bg: #0f1218; --fg: #e8eaed; --muted: #9aa0a6; --accent: #7aa2f7; --done: #5cc98a; --detail: #6e747c;
+  --mark: rgba(250, 204, 21, .32); }
 
 html, body { margin: 0; height: 100%; background: var(--bg); }
 .reveal-viewport { background: var(--bg); color: var(--fg); }
@@ -198,8 +199,8 @@ html.deck-lasing, html.deck-lasing .reveal, html.deck-lasing .deck-frame * { cur
 /* Plots (web/plots.js, Deck.groupedBars). One layout for every chart in the deck: a small legend centred under
    the heading, a compact chart with wide side margins, each group's label centred under its own bars, a small
    light-grey footnote at the bottom. --plot-dy drops the chart when no caption sits under it. */
-:root { --plot-1: #7d8aa0; --plot-2: #d9a93f; --plot-3: var(--accent); --plot-4: var(--done); --plot-5: #ef6b6b; }
-:root[data-theme="light"] { --plot-1: #98a6bc; --plot-2: #dfaa3e; --plot-5: #cf3434; }
+:root { --plot-1: #98a6bc; --plot-2: #dfaa3e; --plot-3: var(--accent); --plot-4: var(--done); --plot-5: #cf3434; }
+:root[data-theme="dark"] { --plot-1: #7d8aa0; --plot-2: #d9a93f; --plot-5: #ef6b6b; }
 .deck-plot { position: absolute; inset: 0; pointer-events: none; --plot-dy: 5%; }
 .deck-plot.captioned { --plot-dy: 0%; }
 .deck-plot-key { position: absolute; left: 4.2%; right: 4.2%; top: calc(19% + var(--plot-dy) / 3); display: flex;

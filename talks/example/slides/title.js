@@ -4,7 +4,7 @@ Deck.slide('title', {
   steps: 2,
   notes: 'Title slide. Press S for the speaker view (these notes, a timer and the next slide), O for the '
     + 'overview, T to switch theme, L for a laser pointer.',
-  mount(frame, { esc }) {
+  mount(frame, { theme, css, esc }) {
     const TITLE = {
       title: 'Live slides with manim-web',
       subtitle: 'A template: every slide drawn in the browser, a click at a time',
@@ -14,7 +14,12 @@ Deck.slide('title', {
     frame.innerHTML = `
       <h1 class="deck-title reveal-in" data-from="1">${esc(TITLE.title)}</h1>
       <p class="deck-subtitle reveal-in" data-from="1" style="--i:1">${esc(TITLE.subtitle)}</p>
-      <div class="deck-byline reveal-in" data-from="2">${esc(TITLE.name)}<span>${esc(TITLE.place)}</span></div>`;
+      <div class="deck-byline reveal-in" data-from="2">${esc(TITLE.name)}<span>${esc(TITLE.place)}</span></div>
+      <p class="ti-hint deck-detail reveal-in" data-from="1" style="--i:2">Press <b>T</b> to switch to
+        ${theme === 'dark' ? 'light' : 'dark'} mode</p>`;
+    // a hint for whoever opens the deck: a key, not part of the talk, so it sits low and quiet
+    css(`.ti-hint { position: absolute; left: 8%; top: 87%; margin: 0; font-size: var(--t-caption); }
+      .ti-hint b { font-weight: 700; color: var(--muted); }`);
     return { enter: (step, animate) => Deck.show(frame, step, animate) };
   },
 });

@@ -14,10 +14,10 @@ const OUTLINE = [
     ['2.1', 'Shapes and transforms'],
     ['2.2', 'Graphs and equations'],
   ]],
-  ['3', 'The 3D add-on: molecules and proteins'],
+  ['3', 'Molecules: 2D drawings and the 3D add-on'],
 ];
 
-const FOOTER = { 1: 'Building blocks', 2: 'Animation', 3: '3D add-on' };
+const FOOTER = { 1: 'Building blocks', 2: 'Animation', 3: 'Molecules' };
 Deck.sections(OUTLINE.map(([num, heading]) => [num, FOOTER[num] || heading]));
 
 // [title, the slides that cover it, one line on what it is]
@@ -31,6 +31,7 @@ Deck.topics({
     ['Graphs and equations', ['manim-graph'], 'axes, a plotted function, MathTex'],
   ],
   3: [
+    ['The protein alphabet', ['alphabet', 'backbone'], '20 amino acids joined into a chain, then lifted into 3D'],
     ['Small molecules', ['molecule'], 'ball and stick with a Mol*-like look'],
     ['Proteins', ['protein'], 'a cartoon from any PDB or mmCIF file'],
   ],
