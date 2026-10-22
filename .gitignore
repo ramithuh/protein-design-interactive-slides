@@ -5,3 +5,5 @@ __pycache__/
 node_modules/
 # wrangler's local cache (tools/deploy_pages.sh)
 .wrangler/
+# the built site (tools/build_site.sh)
+site/

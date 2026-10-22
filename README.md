@@ -52,15 +52,18 @@ agent at it.
 
 ## Publish
 
-The decks are a static site, so any static host works. For Cloudflare Pages (with `wrangler login` done once):
+The decks are a static site, so any static host works. This repo is connected to Cloudflare Pages: every push
+to `main` rebuilds and publishes it. To do the same for your own copy, create a Pages project from your GitHub
+repo with
 
-```bash
-tools/deploy_pages.sh [project]     # default project: interactive-slides
-```
+| Setting | Value |
+| --- | --- |
+| Build command | `bash tools/build_site.sh` |
+| Build output directory | `site` |
 
-It publishes `index.html` (the front page, which opens the example talk), `talks/`, `web/` and `vendor/`, and
-nothing else from the repo. A custom domain is added once in the Pages project, plus a CNAME to
-`<project>.pages.dev` in DNS.
+`tools/build_site.sh` assembles `index.html` (the front page, which opens the example talk), `talks/`, `web/`
+and `vendor/`, and nothing else from the repo. To upload by hand instead (uncommitted work, or a project not
+connected to Git), with `wrangler login` done once: `tools/deploy_pages.sh <project>`.
 
 ## What's in the box
 

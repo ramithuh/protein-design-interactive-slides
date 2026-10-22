@@ -21,7 +21,7 @@ refresh the browser. Decks work offline and straight from disk (`file://`).
 | `web/plots.js` | `Deck.groupedBars`: the one bar-chart layout. |
 | `web/addons/` | The 3D add-on: `molstar.js` (a Mol*-like look), `cartoon.js` (protein cartoons), `turntable.js` (drag/zoom/rock stage with camera moves), `atoms.js` (ball-and-stick, target cages). Only talks that show molecules load these. |
 | `talks/<name>/` | One talk: `index.html` (the slide order), `slides/*.js`, `data/*.js`. `talks/example/` shows every feature. |
-| `tools/` | `check_deck.py` (headless check of a deck), `deploy_pages.sh` (publish to Cloudflare Pages), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
+| `tools/` | `check_deck.py` (headless check of a deck), `build_site.sh` (the published site), `deploy_pages.sh` (manual upload to Cloudflare Pages), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
 | `vendor/` | manim-web, Reveal.js, the Lato font — each with its licence. Never load anything from a CDN. |
 
 ## The slide contract
@@ -161,8 +161,9 @@ console errors. For live work: `python -m http.server 8000` in the repo root, th
 
 ## Publishing
 
-`tools/deploy_pages.sh` publishes the site to Cloudflare Pages (front page, `talks/`, `web/`, `vendor/` only).
-Publishing is outward-facing: deploy only when the person asks, and run `check_deck.py` first. A new talk
+The Cloudflare Pages project is connected to the GitHub repo: **every push to `main` publishes the site**
+(`tools/build_site.sh`: front page, `talks/`, `web/`, `vendor/` only). So pushing is publishing: push only when the
+person asks, and run `check_deck.py` first. `tools/deploy_pages.sh` uploads by hand (e.g. uncommitted work). A new talk
 appears at `/talks/<name>/`; link it from the root `index.html` if it should be findable.
 
 ## Conventions
