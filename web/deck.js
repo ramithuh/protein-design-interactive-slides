@@ -252,12 +252,25 @@
     }).filter((shot) => shot.src && shot.width > 0);
   }
 
+  // Give a canvas's WebGL context back to the browser now. dispose() frees what a scene made, but the context
+  // itself lingers until garbage collection, and past ~16 the browser drops the oldest one, which can be a
+  // slide still on screen. getContext returns the context the canvas already has (null for a 2D canvas).
+  function release(canvas) {
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    const lose = gl && gl.getExtension('WEBGL_lose_context');
+    if (!lose || gl.isContextLost()) return;
+    // the slide is gone, so nobody needs telling: keep the disposed renderer from reporting the loss
+    canvas.addEventListener('webglcontextlost', (e) => e.stopImmediatePropagation(), { capture: true, once: true });
+    lose.loseContext();
+  }
+
   function freeze(s) {
     if (s.state !== 'live') return;
+    const canvases = [...s.frame.querySelectorAll('canvas')];  // before destroy(), which may take them out
     if (s.ctrl.leave) s.ctrl.leave();
     if (s.ctrl.destroy) s.ctrl.destroy();
     s.ctrl = null;
-    s.frame.querySelectorAll('canvas').forEach((c) => c.remove());
+    canvases.forEach((c) => { release(c); c.remove(); });
     for (const shot of s.shots || []) {
       const img = Object.assign(new Image(), { src: shot.src, className: 'deck-still' });
       Object.assign(img.style, { left: `${shot.left * 100}%`, top: `${shot.top * 100}%`,
