@@ -243,6 +243,7 @@ const COPY = {
 };
 
 Deck.slide('design-task', {
+  smoothBack: true,   // its camera moves (and lifts) play in reverse on one click back
   steps: 6,
   interactive: true,
   notes: 'The task (from PDB 1OS7, taurine dioxygenase): an Fe(II), taurine and alpha-ketoglutarate, all given, '
@@ -520,6 +521,30 @@ Deck.slide('design-task', {
           brokenLayer.style.opacity = Math.max(0, 1 - 2.5 * t);
         }, id);
       }
+      // One click back: each step above, played in reverse and quicker; going back over the paste un-pastes, the
+      // tear label fading first and the ring closing as the pinned atoms return to where the model put them.
+      const BACK = 0.45, back = animate === 'back' && target === was - 1;
+      if (back && was === 2) return tween(1500 * BACK, (t) => { moveTo(st.task, st.whole, 1 - t); show(1 - t, 0); }, id);
+      if (back && was === 3) {
+        mix = 0; setAtoms(0);
+        return tween(1600 * BACK, (t) => { moveTo(st.whole, cluster, 1 - t); show(1, 0, 1 - t); }, id);
+      }
+      if (back && was === 4) return tween(1400 * BACK, (t) => { moveTo(cluster, close, 1 - t); show(1, 1 - t, t); }, id);
+      if (back && was === 5) {
+        moveTo(cluster, close, 1);
+        return tween(1600 * BACK, (t) => {
+          mix = 1 - t; setAtoms(mix);
+          brokenLayer.style.opacity = Math.max(0, 1 - 2.5 * t);
+        }, id);
+      }
+      if (back && was === 6) {
+        mix = 1; setAtoms(1);
+        return tween(2000 * BACK, (t) => {
+          moveTo(close, st.whole, 1 - t);
+          show(1, t, 0);
+          brokenLayer.style.opacity = Math.max(0, 1 - 2.5 * (1 - t));
+        }, id);
+      }
       if (target === 1) moveTo(st.task, st.task, 0);
       else if (target === 2 || target === 6) moveTo(st.whole, st.whole, 0);
       else if (target === 3) moveTo(st.whole, cluster, 1);
@@ -565,6 +590,7 @@ const CLASH = {
 };
 
 Deck.slide('design-clash', {
+  smoothBack: true,   // its camera moves (and lifts) play in reverse on one click back
   steps: 3,
   interactive: true,
   notes: 'The bridge from the last slide: that side chain was torn by the paste, so what about the ones the '
@@ -717,6 +743,7 @@ Deck.slide('design-clash', {
       pairLayer.style.opacity = target >= 2 ? 1 : 0;
       nameLayer.style.opacity = target >= 2 ? 1 : 0;
       if (animate && from === 1 && target === 2) return tween(1800, (t) => look(2, t), id);
+      if (animate === 'back' && from === 2 && target === 1) return tween(800, (t) => look(2, 1 - t), id);  // zoom back out
       if (from === 0 && target === 1 && handoff) {  // arriving from the motif slide, which has already zoomed
         Object.assign(rock, handoff);               // back out to this view: same framing, same angle
       }

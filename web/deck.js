@@ -7,9 +7,11 @@
 //     steps: 2,                        // click-steps on the slide (default 1)
 //     notes: 'speaker notes',
 //     interactive: true,               // the slide takes drags/scrolls (no swipe-to-navigate on touch)
+//     smoothBack: true,                // it plays steps in reverse on one click back (see Deck.start's smoothBack)
 //     mount(frame, ctx) {              // build into `frame`; ctx = {theme, palette, data, M, css, esc}
 //       return {
-//         enter(step, animate) {},     // show steps 1..step; animate unless jumping back from later on
+//         enter(step, animate) {},     // show steps 1..step. animate: true going forward; 'back' for one click
+//                                      // back (play the step in reverse, quickly, if it makes sense); false: jump
 //         leave() {},                  // off screen: stop anything running
 //         freeze() {},                 // optional: redraw canvases now, so the deck can picture them
 //         destroy() {},                // unmounted to stay under the browser's WebGL context limit
@@ -85,8 +87,14 @@
 
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-  function start({ title }) {
+  // How going back looks, for the whole deck (Deck.start({ smoothBack })): 'none' jumps back everywhere; '3d'
+  // plays one click back in reverse on the slides that declare smoothBack: true (the 3D slides with their own
+  // reverse moves) and jumps elsewhere; 'all' also fades back the plain reveals and charts of every slide.
+  let smoothBack = 'none';
+
+  function start({ title, smoothBack: back = 'none' }) {
     document.title = title;
+    smoothBack = back;
     const container = document.querySelector('.reveal .slides');
     for (const s of slides) {
       // The frame lives inside Reveal's section, so Reveal places, fades and thumbnails it (overview).
@@ -306,10 +314,18 @@
       // Built on arrival, when the frame has a size, so nothing runs until it is needed.
       if (s.state !== 'live') mount(s);
       const step = 1 + s.section.querySelectorAll('.deck-step.visible').length;
-      // Animate going forward; jump straight to the step when arriving from a later slide.
-      const forward = !event || event.type === 'ready' || event.type === 'fragmentshown'
+      // Animate going forward. One click back is 'back' where smoothBack allows it (above): the slide may play
+      // that step in reverse ('back' is truthy, so its CSS reveals fade rather than snap). A second click back in
+      // quick succession, or arriving from a later slide, jumps straight to the step.
+      let animate = !event || event.type === 'ready' || event.type === 'fragmentshown'
         || (event.type === 'slidechanged' && step === 1);
-      Promise.resolve(busy(s.ctrl.enter(step, forward))).then(() => {
+      if (event && event.type === 'fragmenthidden') {
+        const now = performance.now();
+        const allowed = smoothBack === 'all' || (smoothBack === '3d' && s.def.smoothBack);
+        animate = allowed && now - lastBack > BACK_REPEAT ? 'back' : false;
+        lastBack = now;
+      }
+      Promise.resolve(busy(s.ctrl.enter(step, animate))).then(() => {
         if (Reveal.getIndices().h === i && !Reveal.isOverview()) capture(s);
       });
     });
@@ -328,6 +344,9 @@
     if (!overview) behindTimer = setTimeout(() => { if (Reveal.getIndices().h === current) ahead(slides[current - 1]); }, 400);
   }
   let behindTimer = 0;
+  // a click back this soon after the last one jumps instead of playing in reverse (ms)
+  const BACK_REPEAT = 700;
+  let lastBack = -Infinity;
 
   // The overview shows every slide's frame; build the ones never visited, one at a time and at their last
   // step, then freeze them, so thumbnails exist without holding a WebGL context per slide.

@@ -31,11 +31,13 @@ Deck.slide('name', {
   steps: 3,                 // clicks on this slide (default 1); step 1 is what shows on arrival
   notes: 'speaker notes',   // press S
   interactive: true,        // the slide takes drags/wheel (3D); no swipe navigation on touch
+  smoothBack: true,         // it plays steps in reverse on one click back, when the deck's smoothBack is '3d'
   before: 'other-name',     // optional: insert ahead of an already registered slide
   mount(frame, { theme, palette, data, M, css, esc }) {
     // build into `frame` (16:9; 1em = 1/100 of its width)
     return {
-      enter(step, animate) {},   // show steps 1..step. animate=false: jump there (arrived from a later slide)
+      enter(step, animate) {},   // show steps 1..step. animate: true = going forward, play the step;
+                                 //   'back' = one click back, may play it in reverse (quickly); false = jump
       leave() {},                // optional: off screen, stop loops
       freeze() {},               // optional: redraw canvases now so the deck can picture them
       destroy() {},              // optional: free WebGL/listeners (slides > 2 away are unmounted)
@@ -44,6 +46,13 @@ Deck.slide('name', {
 });
 ```
 
+- **Going back** is set for the whole deck: `Deck.start({ title, smoothBack })`, `'none'` (the default: back
+  always jumps), `'3d'` (slides that declare `smoothBack: true` get one click back as `animate === 'back'`;
+  everything else jumps) or `'all'` (every slide gets 'back', so `Deck.show` and the charts also fade back). A
+  second click within 0.7 s, or arriving from a later slide, always passes `false`. A slide with its own motion
+  may play that step in reverse, faster than forward (about half). Reverse only motion that reads well backwards
+  (camera moves, a lift settling back); content that would look odd undone (a tear healing) should just jump.
+  Every 'back' must still end in exactly the state a jump gives.
 - `enter` must be **idempotent and jump-safe**: `enter(4, false)` straight after mount must give exactly the
   picture you get by clicking through 1→4. Write state per step, not deltas.
 - Wrap a module's constants in `{ ... }` (a block) so names don't collide across files.

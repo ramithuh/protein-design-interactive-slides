@@ -348,6 +348,7 @@ const toScene = ([x, y, z]) => [x, -z, y];        // data: x right, y up, z towa
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
 Deck.slide('backbone', {
+  smoothBack: true,   // its camera moves (and lifts) play in reverse on one click back
   steps: 4,
   interactive: true,
   notes: 'The same seven residues as the alphabet slide; the drawing lifts into their real 3D shape, residues 1-7 '
@@ -588,6 +589,7 @@ Deck.slide('backbone', {
     let step = 0;
     async function go(target, animate) {
       const way = animate && !skip && target === step + 1;
+      const back = animate === 'back' && !skip && target === step - 1;
       const wasOn = sideOn;
       sideOn = target < 3;
       showText(target, way || (animate && target === 1));
@@ -598,6 +600,14 @@ Deck.slide('backbone', {
         await tween(1900, (t) => { morph = t; tilt = TILT * t; });
         rocking = true;
       } else if (way && target === 3 && wasOn) await tween(800, (t) => setSide(1 - t));
+      else if (back && target === 1) {
+        // one click back: the chain settles flat onto the drawing again, then gives way to it
+        rocking = false;
+        const th = theta, ti = tilt;
+        await tween(900, (t) => { morph = 1 - t; tilt = ti * (1 - t); theta = th * (1 - t); });
+        await tween(300, (t) => fadeMol(1 - t));
+        apply(target);
+      } else if (back && target === 2 && !wasOn) await tween(450, (t) => setSide(t));
       else apply(target);
       step = target;
       dirty = true;
