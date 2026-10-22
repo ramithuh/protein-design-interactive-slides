@@ -103,7 +103,12 @@ Deck.slide('alphabet', {
       .aa-card { position: absolute; transform-style: preserve-3d;
         transition: opacity .5s, transform 1.6s cubic-bezier(.45, 0, .25, 1); }
       .aa-card.still, .instant .aa-card { transition: none; }
-      .aa-face { position: absolute; inset: 0; backface-visibility: hidden; }
+      /* Safari: needs the -webkit- prefix to hide a turned card's front (else it shows through, mirrored), and
+         does not pass a preserve-3d card's opacity on to its faces, so the faces fade themselves too */
+      .aa-face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden;
+        transition: opacity .5s; transition-delay: inherit; }
+      .aa-card:not(.in) .aa-face { opacity: 0; }
+      .aa-card.still .aa-face, .instant .aa-card .aa-face { transition: none; }
       .aa-face svg { display: block; width: 100%; height: 100%; overflow: visible; }
       .aa-back { transform: rotateX(180deg); }
       .aa-num { position: absolute; margin-left: calc(-1 * var(--u)); width: calc(2 * var(--u)); height: calc(2 * var(--u));
