@@ -7,6 +7,8 @@ work offline, straight from disk, in a light theme (the default) and a dark one.
 
 ![The example talk: manim-web steps, a chart, figure + points, a molecule and a protein](talks/example/preview.png)
 
+**Live:** [slides.ramith.fyi](https://slides.ramith.fyi): the example talk, rebuilt from `main` on every push.
+
 ## Try it
 
 Open `talks/example/index.html` in Chrome or Firefox (or run `python -m http.server 8000` here and browse to
