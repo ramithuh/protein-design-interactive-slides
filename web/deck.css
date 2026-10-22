@@ -3,9 +3,11 @@
    (a figure's position, say) and take everything else from here. Inside a frame, 1em is 1/100 of the frame's
    width, so sizes scale with the screen. */
 
-@font-face { font-family: Lato; font-weight: 400; src: url("../vendor/fonts/Lato-Regular.ttf") format("truetype"); }
-@font-face { font-family: Lato; font-weight: 600; src: url("../vendor/fonts/Lato-Semibold.ttf") format("truetype"); }
-@font-face { font-family: Lato; font-weight: 700; src: url("../vendor/fonts/Lato-Bold.ttf") format("truetype"); }
+/* WOFF2, cut to Latin, Greek, punctuation, sub/superscripts, arrows and maths (about a third of the TTFs'
+   size); the TTFs beside them are for the Python tools (RDKit draws with them) and are never downloaded. */
+@font-face { font-family: Lato; font-weight: 400; src: url("../vendor/fonts/Lato-Regular.woff2") format("woff2"); }
+@font-face { font-family: Lato; font-weight: 600; src: url("../vendor/fonts/Lato-Semibold.woff2") format("woff2"); }
+@font-face { font-family: Lato; font-weight: 700; src: url("../vendor/fonts/Lato-Bold.woff2") format("woff2"); }
 
 /* The theme colours (web/deck.js mirrors them as Deck.palette, for canvases and SVG): background, text,
    secondary text, the accent (headings, numbers, the point of a figure), done (finished topics), detail
