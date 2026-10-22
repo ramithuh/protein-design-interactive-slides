@@ -158,6 +158,12 @@ html.deck-lasing, html.deck-lasing .reveal, html.deck-lasing .deck-frame * { cur
 .deck-frame .deck-switch.off-stage { opacity: 0; pointer-events: none; }
 .deck-frame.instant .deck-switch { transition: none; }
 
+/* a key on the keyboard: <kbd>F</kbd> */
+.deck-frame kbd { display: inline-block; min-width: 1.5em; padding: .08em .4em; box-sizing: border-box; text-align: center;
+  font: 700 .85em/1.3 Lato, "Helvetica Neue", sans-serif; color: var(--fg); border-radius: .3em;
+  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); border-bottom-width: 2px;
+  background: color-mix(in srgb, var(--fg) 5%, transparent); }
+
 /* code in running text or a point's sub-line */
 .deck-code { font: 500 .92em/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--fg);
   background: color-mix(in srgb, var(--fg) 7%, transparent); padding: .08em .35em; border-radius: .25em; }

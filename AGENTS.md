@@ -72,7 +72,7 @@ one caption line at 87% (`.deck-caption`); the section footer below. Components:
 
 - **Figure + points**: `.deck-figure` (left ~52%) plus `Deck.points([{title, sub, from}], {className})`
   (`.deck-col`). Move the column only through `--col-left`, `--col-top`, `--col-title`, `--col-gap`.
-- **Lead line** under the heading: `.deck-lead`. **Code**: `<code class="deck-code">`.
+- **Lead line** under the heading: `.deck-lead`. **Code**: `<code class="deck-code">`. **Keys**: `<kbd>F</kbd>`.
 - **Emphasis**: `.deck-accent` (accent colour), `<mark class="deck-mark">` (highlighter), `.deck-muted`,
   `.deck-detail` (credits, data sources — quieter than muted).
 - **Charts**: `Deck.groupedBars` only (`web/plots.js`); one series is a plain bar chart. Don't hand-build charts.
