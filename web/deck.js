@@ -63,7 +63,8 @@
   };
   // Most browsers keep about 16 WebGL contexts and silently drop the oldest beyond that; each manim-web
   // scene holds one. Slides further than this from the current one are unmounted, and rebuilt on return.
-  const KEEP = 2;
+  // 3 keeps at most 7 slides live, well under the limit, so stepping back rarely meets a rebuilt slide.
+  const KEEP = 3;
 
   // light by default; ?theme=dark (or T while presenting) for the dark theme
   const theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
@@ -301,12 +302,19 @@
     });
     // The next slide is built ahead, so it has drawn its opening frame before you arrive: crossfading into a
     // frame that is still building reads as a cut, and breaks hand-offs that continue one picture onto the next.
-    const next = slides[current + 1];
-    if (next && !overview && next.state !== 'live' && next.section.getClientRects().length) {
-      mount(next);
-      if (next.ctrl.leave) next.ctrl.leave();
-    }
+    const ahead = (s) => {
+      if (!s || Reveal.isOverview() || s.state === 'live' || !s.section.getClientRects().length) return;
+      mount(s);
+      if (s.ctrl.leave) s.ctrl.leave();
+    };
+    if (!overview) ahead(slides[current + 1]);
+    // The previous slide is built too, so stepping back lands on a slide that is ready rather than one that
+    // builds (3D setup takes a moment) as you arrive. It waits a little, so its setup does not hold up the
+    // step you are watching, and only if you are still on this slide.
+    clearTimeout(behindTimer);
+    if (!overview) behindTimer = setTimeout(() => { if (Reveal.getIndices().h === current) ahead(slides[current - 1]); }, 400);
   }
+  let behindTimer = 0;
 
   // The overview shows every slide's frame; build the ones never visited, one at a time and at their last
   // step, then freeze them, so thumbnails exist without holding a WebGL context per slide.
