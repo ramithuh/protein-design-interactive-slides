@@ -137,6 +137,29 @@ def draw(mol, side, window):
 STEP = 1.299  # x step between backbone atoms on the zigzag (1.5-unit bonds at 120°)
 
 
+# RDKit's peptide builder names isoleucine's γ-carbons the other way round from the PDB, where CD1 hangs off CG1
+# (the ethyl arm) and CG2 is the methyl. The drawing uses RDKit's names throughout, which is consistent; only the
+# names written out for a 3D model to match against (PDB names) are translated.
+RDKIT_TO_PDB = {"I": {"CG1": "CG2", "CG2": "CG1"}}
+
+
+def pdb_name(one, name):
+    return RDKIT_TO_PDB.get(one, {}).get(name, name)
+
+
+def check_pairing(segment, peptide):
+    """Every bond of the 3D stretch should be one bond long in the drawing too: a name paired with the wrong atom
+    shows up as a bond that starts stretched across the drawing."""
+    atoms, flat = segment["atoms"], peptide["atoms"]
+    where = [flat[f"{a['res']} {a['name']}"] for a in atoms]
+    lengths = [math.dist(where[i], where[j]) for i, j, *_ in segment["bonds"]]
+    typical = sorted(lengths)[len(lengths) // 2]
+    bad = [f"{atoms[i]['res']} {atoms[i]['name']}-{atoms[j]['name']} ({math.dist(where[i], where[j]) / typical:.1f}x)"
+           for i, j, *_ in segment["bonds"] if math.dist(where[i], where[j]) > 1.3 * typical]
+    assert not bad, f"atoms paired wrongly between the drawing and the 3D stretch: {bad}"
+    print(f"pairing checked: all {len(lengths)} bonds are one bond long in the drawing")
+
+
 def peptide(segment, depictions):
     """The stretch's amino acids on a zigzag chain: free ones (each with its own OH and H2N) and the joined
     peptide, all in the same coordinates. depictions: one-letter code -> its alphabet drawing's molecule."""
@@ -182,7 +205,7 @@ def peptide(segment, depictions):
     # every atom of the joined peptide, as "<residue index> <PDB atom name>" -> drawn position, so a 3D model of
     # the same residues can start exactly on the drawing
     out = {"seq": seq, "window": [round(v, 3) for v in window], "size": size, "svg": svg, "residues": [],
-           "atoms": {f"{k} {name}": xy for (k, name), xy in named.items()}}
+           "atoms": {f"{k} {pdb_name(seq[k], name)}": xy for (k, name), xy in named.items()}}
     for k, m in enumerate(free):
         for a in m.GetAtoms():  # number the free residue as residue k, for side_of
             a.GetPDBResidueInfo().SetResidueNumber(k + 1)
@@ -330,6 +353,8 @@ def main():
         assert len(set(args.peptide)) == len(args.peptide), "the slide picks residues by letter: no letter twice"
         segment = {"residues": [{"one": c} for c in args.peptide.upper()]}
         out["peptide"] = peptide(segment, {a[0]: m for a, m in zip(AMINO, mols)})
+        if "segment" in out:
+            check_pairing(out["segment"], out["peptide"])
 
     sizes = {tuple(a["ca"]) for a in out["amino_acids"]}
     if len(sizes) != 1:
