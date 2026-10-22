@@ -247,13 +247,24 @@
   // Picture every canvas while the slide is laid out. A WebGL canvas can only be read in the task that
   // drew it, so the module's freeze() redraws first. Taken after each step, because by the time a slide
   // is unmounted Reveal may already have hidden it (display: none leaves nothing to read).
+  // A still is only ever seen small (an overview thumbnail), so it is taken at most STILL_W pixels wide: reading
+  // back and encoding a full-size canvas (3200 px on a Retina screen) would stall the page after every step.
+  const STILL_W = 800;
+  function still(c) {
+    const k = Math.min(1, STILL_W / c.width);
+    if (k === 1) return c.toDataURL('image/webp', 0.85);
+    const t = Object.assign(document.createElement('canvas'), { width: Math.round(c.width * k), height: Math.round(c.height * k) });
+    t.getContext('2d').drawImage(c, 0, 0, t.width, t.height);
+    return t.toDataURL('image/webp', 0.85);
+  }
+
   function capture(s) {
     if (s.state !== 'live' || !s.frame.getClientRects().length) return;
     if (s.ctrl.freeze) s.ctrl.freeze();
     const box = s.frame.getBoundingClientRect();
     s.shots = [...s.frame.querySelectorAll('canvas')].map((c) => {
       let src = null;
-      try { src = c.toDataURL('image/webp', 0.9); } catch (err) { /* lost context */ }
+      try { src = still(c); } catch (err) { /* lost context */ }
       const r = c.getBoundingClientRect();
       return { src, left: (r.left - box.left) / box.width, top: (r.top - box.top) / box.height,
                width: r.width / box.width, height: r.height / box.height };
