@@ -52,6 +52,18 @@ Deck.slide('hello', {
 grid, colours, components), the manim-web stage, the 3D add-on, data files and checking. Point your coding
 agent at it.
 
+## Export to PDF
+
+For a conference upload or a handout:
+
+```bash
+python tools/export_pdf.py talks/my_talk                  # talks/my_talk/my_talk.pdf, a page per slide
+python tools/export_pdf.py talks/my_talk --steps all      # a page per click
+python tools/export_pdf.py talks/my_talk --theme dark --scale 2 --pngs previews/   # sharper, plus PNG previews
+```
+
+Pages are pictures of the live slides (3D included), so the text is not selectable.
+
 ## Publish
 
 The decks are a static site, so any static host works. This repo is connected to Cloudflare Pages: every push

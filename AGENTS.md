@@ -21,7 +21,7 @@ refresh the browser. Decks work offline and straight from disk (`file://`).
 | `web/plots.js` | `Deck.groupedBars`: the one bar-chart layout. |
 | `web/addons/` | The 3D add-on: `molstar.js` (a Mol*-like look), `cartoon.js` (protein cartoons), `turntable.js` (drag/zoom/rock stage with camera moves), `atoms.js` (ball-and-stick, target cages). Only talks that show molecules load these. |
 | `talks/<name>/` | One talk: `index.html` (the slide order), `slides/*.js`, `data/*.js`. `talks/example/` shows every feature. |
-| `tools/` | `check_deck.py` (headless check of a deck), `build_site.sh` (the published site), `deploy_pages.sh` (manual upload to Cloudflare Pages), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
+| `tools/` | `check_deck.py` (headless check of a deck), `export_pdf.py` (a PDF of pictures, per slide or per click), `build_site.sh` (the published site), `deploy_pages.sh` (manual upload to Cloudflare Pages), `prep_protein.py` (structure → cartoon data), `prep_amino_acids.py` (the alphabet slides' RDKit drawings and 3D stretch), `vendor_manim_web.sh`. |
 | `vendor/` | manim-web, Reveal.js, the Lato font — each with its licence. Never load anything from a CDN. |
 
 ## The slide contract

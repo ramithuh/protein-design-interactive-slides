@@ -7,3 +7,5 @@ node_modules/
 .wrangler/
 # the built site (tools/build_site.sh)
 site/
+# PDFs from tools/export_pdf.py (they would otherwise be published with the talk)
+talks/*/*.pdf
