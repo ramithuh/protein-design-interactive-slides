@@ -123,6 +123,13 @@ The data those slides read is prepared once, in Python, by the scripts in `tools
 A recent Chrome, Edge or Firefox. Python only for the tools: `pip install playwright gemmi numpy rdkit` (and
 `playwright install chromium`); `mdtraj` optionally, for DSSP on structures without helix/sheet records.
 
+## License
+
+[MIT](LICENSE): use it, change it, build your own talks on it (they can stay private); keep the notice in copies
+of the template's code. The bundled libraries and font in `vendor/` keep their own licences, in each folder:
+manim-web, three.js and Reveal.js are MIT, Lato is SIL OFL. The example structures 1UBQ and 1OS7 come from the
+PDB, which is public domain (CC0).
+
 ## Credits
 
 **Bundled** in `vendor/`, each with its licence: [manim-web](https://github.com/maloyan/manim-web) 0.39.4 by
