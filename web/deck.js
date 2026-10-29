@@ -164,6 +164,7 @@
       if (e.button === 0) Reveal.next(); else Reveal.prev();
     });
     ['ready', 'slidechanged', 'fragmentshown', 'fragmenthidden', 'overviewhidden'].forEach((e) => Reveal.on(e, sync));
+    Reveal.on('slidechanged', () => { if (Reveal.isOverview()) fillOverview(); });
     if (sections.length) {
       const light = footer();
       ['ready', 'slidechanged'].forEach((e) => Reveal.on(e, light));
@@ -361,20 +362,26 @@
 
   // The overview shows every slide's frame; build the ones never visited, one at a time and at their last
   // step, then freeze them, so thumbnails exist without holding a WebGL context per slide.
-  let filling = false;
+  // Reveal only lays out the slides near the current one, and moving around the overview brings others into view,
+  // so each move asks for another pass (run once the current pass ends); a pass builds the nearest slides first.
+  let filling = false, refill = false;
   async function fillOverview() {
-    if (filling) return;
+    if (filling) { refill = true; return; }
     filling = true;
-    const current = Reveal.getIndices().h;
-    for (const [i, s] of slides.entries()) {
-      if (!Reveal.isOverview()) break;
-      if (s.state !== 'empty' || !s.section.getClientRects().length) continue;
-      mount(s);
-      await s.ctrl.enter(s.def.steps || 1, false);
-      capture(s);
-      if (Math.abs(i - current) > KEEP) freeze(s); else s.ctrl.leave && s.ctrl.leave();
-      await new Promise(requestAnimationFrame);
-    }
+    do {
+      refill = false;
+      const current = Reveal.getIndices().h;
+      const order = [...slides.entries()].sort(([a], [b]) => Math.abs(a - current) - Math.abs(b - current));
+      for (const [i, s] of order) {
+        if (!Reveal.isOverview()) break;
+        if (s.state !== 'empty' || !s.section.getClientRects().length) continue;
+        mount(s);
+        await s.ctrl.enter(s.def.steps || 1, false);
+        capture(s);
+        if (Math.abs(i - Reveal.getIndices().h) > KEEP) freeze(s); else s.ctrl.leave && s.ctrl.leave();
+        await new Promise(requestAnimationFrame);
+      }
+    } while (refill && Reveal.isOverview());
     filling = false;
   }
 
