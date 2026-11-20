@@ -163,6 +163,34 @@
       if (e.target.closest && e.target.closest(CONTROLS)) return;
       if (e.button === 0) Reveal.next(); else Reveal.prev();
     });
+    // Scroll left and right through the overview (two-finger trackpad swipe, or mouse wheel). Capturing on
+    // the stage keeps a live 3D thumbnail's zoom handler from taking the wheel, and preventDefault stops a
+    // horizontal trackpad swipe from triggering the browser's back/forward navigation. Accumulating deltas
+    // (rather than stepping on every wheel event) fits trackpad streams and mouse notches alike; the
+    // dominant axis is locked for the gesture so a slight vertical drift never fights a horizontal swipe.
+    const SCROLL_STEP = 100, SCROLL_IDLE = 250;
+    let scrollAcc = 0, scrollAxis = null, scrollAt = -Infinity;
+    const resetScroll = () => { scrollAcc = 0; scrollAxis = null; };
+    stage.addEventListener('wheel', (e) => {
+      if (!Reveal.isOverview() || e.ctrlKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (!e.deltaX && !e.deltaY) return;
+      if (e.timeStamp - scrollAt > SCROLL_IDLE) resetScroll();
+      scrollAt = e.timeStamp;
+      if (!scrollAxis) scrollAxis = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? 'x' : 'y';
+      const raw = scrollAxis === 'x' ? e.deltaX : e.deltaY;
+      const scale = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? SCROLL_STEP : 1;
+      const d = raw * scale;
+      if (!d) return;
+      if (scrollAcc * d < 0) scrollAcc = 0;
+      scrollAcc += d;
+      while (Math.abs(scrollAcc) >= SCROLL_STEP) {
+        if (scrollAcc > 0) { Reveal.right(); scrollAcc -= SCROLL_STEP; }
+        else { Reveal.left(); scrollAcc += SCROLL_STEP; }
+      }
+    }, { capture: true, passive: false });
+    Reveal.on('overviewhidden', resetScroll);
     ['ready', 'slidechanged', 'fragmentshown', 'fragmenthidden', 'overviewhidden'].forEach((e) => Reveal.on(e, sync));
     Reveal.on('slidechanged', () => { if (Reveal.isOverview()) fillOverview(); });
     if (sections.length) {
